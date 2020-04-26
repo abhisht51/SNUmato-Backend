@@ -48,7 +48,7 @@ class Menu_item(models.Model):
         return self.item_name
 
 
-class Order(models.Model):                                      # db for displaying users past orders. 
+class Orders(models.Model):                                      # db for displaying users past orders. 
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     order_id = models.PositiveIntegerField(null=False)
     date_time = models.DateTimeField(auto_now=True,null=True)

@@ -58,7 +58,33 @@ def getmenu(request):
     return JsonResponse({"restaurants":list(menu_items.values())})
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #USER INFO 
+
 
 @api_view(["POST"])
 def register(request):
