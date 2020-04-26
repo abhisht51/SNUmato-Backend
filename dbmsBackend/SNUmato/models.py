@@ -25,6 +25,8 @@ class Restaurant(models.Model):
     contact_number = models.CharField(max_length=100,help_text='Contact Number of the restaurant owner',null=True)
     class Meta:
         db_table = 'Restaurant'
+    def __str__(self):
+        return self.name
 
 
 class Menu_item(models.Model):
@@ -42,9 +44,11 @@ class Menu_item(models.Model):
     
     class Meta:
         db_table = 'Menu_Item'
+    def __str__(self):
+        return self.item_name
 
 
-class Orders(models.Model):                                      # db for displaying users past orders. 
+class Order(models.Model):                                      # db for displaying users past orders. 
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     order_id = models.PositiveIntegerField(null=False)
     date_time = models.DateTimeField(auto_now=True,null=True)
@@ -54,24 +58,24 @@ class Orders(models.Model):                                      # db for displa
                 ("Online-UPI","UPI"),
                 ("Online-Paytm","PAYTM"),)
     payment_method = models.CharField(max_length=30,default='COD',choices=CHOICES)
+    def __str__(self):
+        return self.user.name + " " + self.order_id
+    class Meta:
+        db_table = 'Orders'
 
 class Current_order(models.Model): 
     # TODO cart item funtion 
-    #order_description = models.CharField(max_length=1000)
+    
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     item_cost = models.CharField(max_length=100)
     item_quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100)
     item_id = models.CharField(max_length=100)
     
-    #ETA = models.TimeField()
-
-
-# class Order_history(models.Model):
-#     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
-#     order_description = models.CharField(max_length=1000)
-#     order_id = models.PositiveIntegerField(null=False)
-#     order_date
-
+    class Meta:
+        db_table = 'Current_order'
+    def __str__(self):
+        return self.item_name
 
 
 class UserManager(BaseUserManager):

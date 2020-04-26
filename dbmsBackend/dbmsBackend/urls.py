@@ -26,6 +26,11 @@ urlpatterns = [
     
     
     
+    #GET resquest
+    path('restaurants',views.getAllRestaurants),
+    path('restaurants_menu',views.getmenu),
+
+
     
     #USER URLS 
     path('user/register',views.register),

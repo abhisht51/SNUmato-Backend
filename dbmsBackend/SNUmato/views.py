@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 import uuid
 from .serializers import cart_Serializers,menu_Serializers,restaurant_Serializer,orders_Serializers 
-
+ 
 
 
 
@@ -25,18 +25,37 @@ def test(request):
 
 
 
-#RESTAURANT 
 
-@api_view(["POST"])
-def item_post(request):
-    item_name = request.data.get('item_name')
-    item_category = request.data.get('item_category')
-    item_description = request.data.get('item_description')
-    item_cost = request.data.get('item_cost')
-    veg_nonVeg = request.data.get('vegnonVeg')
-    #item = Menu_item.objects.create_user()
 
-    #TODO LOL 
+# @api_view(["POST"])
+# def item_post(request):
+#     item_name = request.data.get('item_name')
+#     item_category = request.data.get('item_category')
+#     item_description = request.data.get('item_description')
+#     item_cost = request.data.get('item_cost')
+#     veg_nonVeg = request.data.get('vegnonVeg')
+#     #item = Menu_item.objects.create_user()
+
+
+
+#RESTAURANTS 
+
+@api_view(["GET"])
+def getAllRestaurants(request):
+    cultural_data = []
+    queryset = Restaurant.objects.all().values()
+    return JsonResponse({"restaurants":list(queryset)})
+
+
+
+#MENU 
+
+@api_view(["GET"])
+def getmenu(request):
+    resutaurant_id = request.GET.get('restaurant_id')
+    print(str(resutaurant_id) + " HEYLLLLLO")
+    menu_items = Menu_item.objects.filter(restaurant=resutaurant_id)
+    return JsonResponse({"restaurants":list(menu_items.values())})
 
 
 #USER INFO 
