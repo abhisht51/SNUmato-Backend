@@ -34,7 +34,7 @@ class Menu_item(models.Model):
     item_name = models.CharField(max_length=100)
     item_category = models.CharField(max_length=100)
     item_description = models.TextField(default="") #TODO check before sending as a JSON 
-    item_cost = models.CharField(max_length=100)
+    item_cost = models.PositiveIntegerField()
 
     CHOICES = (("Veg","Veg"),
                 ("Non Veg","Non Veg"),
@@ -66,7 +66,7 @@ class Orders(models.Model):                                      # db for displa
 class Current_order(models.Model): 
     # TODO cart item funtion 
     
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,default=0)
     item_cost = models.CharField(max_length=100)
     item_quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100)

@@ -38,12 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'SNUmato',
+	'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -115,6 +117,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+CORS_ORIGIN_ALLOW_ALL = True # added to solve CORS
 
 
 # Static files (CSS, JavaScript, Images)
