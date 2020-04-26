@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.http import HttpResponse, JsonResponse
-from SNUmato.models import User
+from SNUmato.models import User,Menu_item,Current_order,Orders,Restaurant
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager
 )
@@ -25,8 +25,18 @@ def test(request):
 
 
 
+#RESTAURANT 
 
+@api_view(["POST"])
+def item_post(request):
+    item_name = request.data.get('item_name')
+    item_category = request.data.get('item_category')
+    item_description = request.data.get('item_description')
+    item_cost = request.data.get('item_cost')
+    veg_nonVeg = request.data.get('vegnonVeg')
+    #item = Menu_item.objects.create_user()
 
+    #TODO LOL 
 
 
 #USER INFO 

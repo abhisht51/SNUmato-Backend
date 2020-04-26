@@ -8,7 +8,6 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager
 )
-
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -20,6 +19,7 @@ class Restaurant(models.Model):
     restaurant_id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=100)
+    rating = models.DecimalField(max_digits=2,decimal_places=1)
     working_hours = models.CharField(max_length=100)
     cost_for_two = models.CharField(max_length=100)
     contact_number = models.CharField(max_length=100,help_text='Contact Number of the restaurant owner',null=True)
@@ -28,26 +28,49 @@ class Restaurant(models.Model):
 
 
 class Menu_item(models.Model):
-    restaurant_id = models.PositiveIntegerField()   # concept of 1:1 Foreign KEY TODO 
+    restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE)  # concept of 1:1 Foreign KEY TODO 
     item_name = models.CharField(max_length=100)
     item_category = models.CharField(max_length=100)
     item_description = models.TextField(default="") #TODO check before sending as a JSON 
     item_cost = models.CharField(max_length=100)
-    veg_nonVeg = models.CharField(max_length=100) 
+
+    CHOICES = (("Veg","Veg"),
+                ("Non Veg","Non Veg"),
+            )
+
+    veg_nonVeg = models.CharField(max_length=100,null=True,choices=CHOICES) 
     
     class Meta:
         db_table = 'Menu_Item'
 
 
-class Orders(models.Model):
-    order_id = models.PositiveIntegerField(primary_key=True)
-    date_time = models.DateField(default=datetime.now)
-    payment_method = models.CharField(max_length=30,default='COD')
+class Orders(models.Model):                                      # db for displaying users past orders. 
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    order_id = models.PositiveIntegerField(null=False)
+    date_time = models.DateTimeField(auto_now=True,null=True)
+    order_description = models.CharField(max_length=1000)
+    total_amount = models.DecimalField(max_digits=9,decimal_places=2)
+    CHOICES = (("Cash On Delivery","COD"),
+                ("Online-UPI","UPI"),
+                ("Online-Paytm","PAYTM"),)
+    payment_method = models.CharField(max_length=30,default='COD',choices=CHOICES)
 
-class Cart(models.Model):
+class Current_order(models.Model): 
     # TODO cart item funtion 
-    cost = models.IntegerField()
-    ETA = models.TimeField()
+    #order_description = models.CharField(max_length=1000)
+    item_cost = models.CharField(max_length=100)
+    item_quantity = models.PositiveIntegerField()
+    item_name = models.CharField(max_length=100)
+    item_id = models.CharField(max_length=100)
+    
+    #ETA = models.TimeField()
+
+
+# class Order_history(models.Model):
+#     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
+#     order_description = models.CharField(max_length=1000)
+#     order_id = models.PositiveIntegerField(null=False)
+#     order_date
 
 
 
