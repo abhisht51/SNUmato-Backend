@@ -49,7 +49,7 @@ class Menu_item(models.Model):
 
 
 class Orders(models.Model):                                      # db for displaying users past orders. 
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     order_id = models.PositiveIntegerField(null=False)
     date_time = models.DateTimeField(auto_now=True,null=True)
     order_description = models.CharField(max_length=1000)
@@ -66,7 +66,7 @@ class Orders(models.Model):                                      # db for displa
 class Current_order(models.Model): 
     # TODO cart item funtion 
     
-    user = models.ForeignKey(User,on_delete=models.CASCADE,default=0)
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,default=0)
     item_cost = models.CharField(max_length=100)
     item_quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100)

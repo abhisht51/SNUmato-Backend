@@ -74,6 +74,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dbmsBackend.wsgi.application'
 
+AUTH_USER_MODEL = 'SNUmato.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny', )
+}
+
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
