@@ -70,48 +70,60 @@ def addtocart(request):
     item_id = request.data.get('item_id')
     quantity = request.data.get('quantity')
     
-    menu_item =  Menu_item.objects.get(restaurant=restaurant_id,id=item_id)
-   
-    p = Current_order.objects.create(user=user,item_cost=menu_item.item_cost,item_quantity =  quantity,item_name = menu_item.item_name,u_id=user.id)
+    try:
+        menu_item =  Menu_item.objects.get(restaurant=restaurant_id,id=item_id)
+    except:
+        return Response({
+            "message":"Error No such item in the database"
+        },status=status.HTTP_400_BAD_REQUEST)
+
     try :
-        # p = Current_order.objects.create(user=user.id,item_cost=menu_item.item_cost,quantity =  quantity,item_name = menu_item.item_name )
-        # p.user = user.id 
-        # p.item_cost = menu_item.item_cost
-        # p.quantity =  int(quantity)
-        # p.item_name = menu_item.item_name 
+        p = Current_order.objects.create(user=user,item_cost=menu_item.item_cost,item_quantity = quantity,item_name = menu_item.item_name,u_id=user.id,item_id=item_id)
         p.save()
     except:
         return Response({
             "message":"Error OOOOF"
         },status=status.HTTP_400_BAD_REQUEST)
     return Response({
-         "message":"success"
+         "message":"Item has been successfully added to the cart."
     },status=status.HTTP_202_ACCEPTED)
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticated, ))
 def updatecart(request):
     user = get_object_or_404(User, email=request.user)
-    password = request.data.get("password")
-    user = authenticate(email=user.email, password=password)
-    if not user:
-        return Response({'error': 'Invalid Credentials', 'status': 'fail'})
-    user.set_password(request.data.get('new_password'))
-    user.save()
-    return JsonResponse({'status': 'success'})
+    item_id = request.data.get('item_id')
+    quantity = request.data.get('quantity')
+    p = Current_order.objects.get(user=user,item_id=item_id)
+    p.item_quantity = quantity
+    p.save()
+    try :
+        p = Current_order.objects.get(user=user,item_id=item_id)
+        p.item_quantity = quantity
+        p.save()
+    except:
+        return Response({
+            "message":"Error OOOOF"
+        },status=status.HTTP_400_BAD_REQUEST)
+    return Response({
+         "message":"Success. Item Quantity has been updated."
+    },status=status.HTTP_202_ACCEPTED)
 
 @api_view(["POST"])
 @permission_classes((IsAuthenticated, ))
 def deleteitem(request):
     user = get_object_or_404(User, email=request.user)
-    password = request.data.get("password")
-    user = authenticate(email=user.email, password=password)
-    if not user:
-        return Response({'error': 'Invalid Credentials', 'status': 'fail'})
-    user.set_password(request.data.get('new_password'))
-    user.save()
-    return JsonResponse({'status': 'success'})
-
+    item_id = request.data.get('item_id')
+    try :
+        p = Current_order.objects.get(user=user,item_id=item_id)       
+        p.delete()               
+    except:
+        return Response({
+            "message":"Error  No such item in the database OOF"
+        },status=status.HTTP_400_BAD_REQUEST)
+    return Response({
+         "message":"Success. Item has been removed from the cart."
+    },status=status.HTTP_202_ACCEPTED)
 
 
 
