@@ -25,6 +25,12 @@ urlpatterns = [
     
     
     
+        
+    #POST resquest
+    path('addtocart',views.addtocart),
+    path('deleteitem',views.deleteitem),
+    path('updatecart',views.updatecart),
+
     
     #GET resquest
     path('restaurants',views.getAllRestaurants),

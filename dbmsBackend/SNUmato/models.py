@@ -8,6 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager
 )
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -32,6 +33,7 @@ class Restaurant(models.Model):
 class Menu_item(models.Model):
     restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE)  # concept of 1:1 Foreign KEY TODO 
     item_name = models.CharField(max_length=100)
+
     item_category = models.CharField(max_length=100)
     item_description = models.TextField(default="") #TODO check before sending as a JSON 
     item_cost = models.PositiveIntegerField()
@@ -49,8 +51,9 @@ class Menu_item(models.Model):
 
 
 class Orders(models.Model):                                      # db for displaying users past orders. 
-    # user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     order_id = models.PositiveIntegerField(null=False)
+    u_id = models.PositiveIntegerField(null=False)
     date_time = models.DateTimeField(auto_now=True,null=True)
     order_description = models.CharField(max_length=1000)
     total_amount = models.DecimalField(max_digits=9,decimal_places=2)
@@ -66,8 +69,10 @@ class Orders(models.Model):                                      # db for displa
 class Current_order(models.Model): 
     # TODO cart item funtion 
     
-    # user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,default=0)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     item_cost = models.CharField(max_length=100)
+    u_id = models.PositiveIntegerField(null=False)
+
     item_quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100)
     item_id = models.CharField(max_length=100)

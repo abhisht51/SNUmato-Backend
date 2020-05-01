@@ -13,6 +13,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 import uuid
+from rest_framework import status
 from .serializers import cart_Serializers,menu_Serializers,restaurant_Serializer,orders_Serializers 
  
 
@@ -58,10 +59,58 @@ def getmenu(request):
     return JsonResponse({"restaurants":list(menu_items.values())})
 
 
+#CURRENT ORDERS / CART 
 
 
+@api_view(["POST"])
+@permission_classes((IsAuthenticated, ))
+def addtocart(request):
+    user = get_object_or_404(User, email=request.user)
+    restaurant_id = request.data.get('restaurant_id')
+    item_id = request.data.get('item_id')
+    quantity = request.data.get('quantity')
+    
+    menu_item =  Menu_item.objects.get(restaurant=restaurant_id,id=item_id)
+   
+    p = Current_order.objects.create(user=user,item_cost=menu_item.item_cost,item_quantity =  quantity,item_name = menu_item.item_name,u_id=user.id)
+    try :
+        # p = Current_order.objects.create(user=user.id,item_cost=menu_item.item_cost,quantity =  quantity,item_name = menu_item.item_name )
+        # p.user = user.id 
+        # p.item_cost = menu_item.item_cost
+        # p.quantity =  int(quantity)
+        # p.item_name = menu_item.item_name 
+        p.save()
+    except:
+        return Response({
+            "message":"Error OOOOF"
+        },status=status.HTTP_400_BAD_REQUEST)
+    return Response({
+         "message":"success"
+    },status=status.HTTP_202_ACCEPTED)
 
+@api_view(["POST"])
+@permission_classes((IsAuthenticated, ))
+def updatecart(request):
+    user = get_object_or_404(User, email=request.user)
+    password = request.data.get("password")
+    user = authenticate(email=user.email, password=password)
+    if not user:
+        return Response({'error': 'Invalid Credentials', 'status': 'fail'})
+    user.set_password(request.data.get('new_password'))
+    user.save()
+    return JsonResponse({'status': 'success'})
 
+@api_view(["POST"])
+@permission_classes((IsAuthenticated, ))
+def deleteitem(request):
+    user = get_object_or_404(User, email=request.user)
+    password = request.data.get("password")
+    user = authenticate(email=user.email, password=password)
+    if not user:
+        return Response({'error': 'Invalid Credentials', 'status': 'fail'})
+    user.set_password(request.data.get('new_password'))
+    user.save()
+    return JsonResponse({'status': 'success'})
 
 
 
@@ -105,11 +154,11 @@ def register(request):
     user.save()
 
     # Generate Token for user
-    # token = Token.objects.create(user=user)
+    token = Token.objects.create(user=user)
 
     logged_in_user = User.objects.filter(email=user).values()[0]
     return JsonResponse({'status': 'success',
-    # 'token': token.key, 
+    'token': token.key, 
      'user_data': {
         'email': logged_in_user.get('email'),
         'first_name': logged_in_user.get('first_name'),
