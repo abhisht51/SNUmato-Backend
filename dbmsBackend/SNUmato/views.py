@@ -68,8 +68,7 @@ def addtocart(request):
     user = get_object_or_404(User, email=request.user)
     restaurant_id = request.data.get('restaurant_id')
     item_id = request.data.get('item_id')
-    quantity = request.data.get('quantity')
-    
+    quantity = request.data.get('quantity')    
     try:
         menu_item =  Menu_item.objects.get(restaurant=restaurant_id,id=item_id)
     except:
@@ -94,9 +93,6 @@ def updatecart(request):
     user = get_object_or_404(User, email=request.user)
     item_id = request.data.get('item_id')
     quantity = request.data.get('quantity')
-    p = Current_order.objects.get(user=user,item_id=item_id)
-    p.item_quantity = quantity
-    p.save()
     try :
         p = Current_order.objects.get(user=user,item_id=item_id)
         p.item_quantity = quantity
@@ -126,7 +122,29 @@ def deleteitem(request):
     },status=status.HTTP_202_ACCEPTED)
 
 
+@api_view(["GET"])
+@permission_classes((IsAuthenticated, ))
+def cart(request):
+    user = get_object_or_404(User, email=request.user)
+    try :
+        p = Current_order.objects.filter(user=user)
+    except:
+        return Response({
+            "message":"Error : Cart is empty OOF"
+        },status=status.HTTP_200_OK)
 
+
+    totalcost = 0
+    for i in p.values():
+        totalcost = totalcost + int(i["item_cost"])*int(i["item_quantity"])
+        
+    return Response({
+         "data":list(p.values()),
+         "total_cost" : totalcost,
+          "total_cost_gst": totalcost*(1.1),
+           "delivery": 10,
+           "final_cost": totalcost*(1.1) + 10,     
+    },status=status.HTTP_202_ACCEPTED)
 
 
 

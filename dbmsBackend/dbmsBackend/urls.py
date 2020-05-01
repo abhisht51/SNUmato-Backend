@@ -35,6 +35,8 @@ urlpatterns = [
     #GET resquest
     path('restaurants',views.getAllRestaurants),
     path('restaurants_menu',views.getmenu),
+    path('cart',views.cart),
+
 
 
     
