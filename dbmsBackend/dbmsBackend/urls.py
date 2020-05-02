@@ -20,7 +20,7 @@ from SNUmato import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.test),\
+    path('',views.test),
     #POST resquest
     path('addtocart',views.addtocart),
     path('deleteitem',views.deleteitem),
