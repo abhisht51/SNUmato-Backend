@@ -25,27 +25,13 @@ def test(request):
     return HttpResponse('Test chal rha') 
 
 
-
-
-
-# @api_view(["POST"])
-# def item_post(request):
-#     item_name = request.data.get('item_name')
-#     item_category = request.data.get('item_category')
-#     item_description = request.data.get('item_description')
-#     item_cost = request.data.get('item_cost')
-#     veg_nonVeg = request.data.get('vegnonVeg')
-#     #item = Menu_item.objects.create_user()
-
-
-
 #RESTAURANTS 
 
 @api_view(["GET"])
 def getAllRestaurants(request):
     cultural_data = []
     queryset = Restaurant.objects.all().values()
-    return JsonResponse({"restaurants":list(queryset)})
+    return Response({"restaurants":list(queryset)})
 
 
 
@@ -56,7 +42,7 @@ def getmenu(request):
     resutaurant_id = request.GET.get('restaurant_id')
     print(str(resutaurant_id) + " HEYLLLLLO")
     menu_items = Menu_item.objects.filter(restaurant=resutaurant_id)
-    return JsonResponse({"restaurants":list(menu_items.values())})
+    return Response({"restaurants":list(menu_items.values())})
 
 
 #CURRENT ORDERS / CART 
@@ -203,10 +189,26 @@ def placeorder(request):
     },status=status.HTTP_200_OK)
 
 
+# ORDER HISTORY  
+@api_view(["GET"])
+@permission_classes((IsAuthenticated, ))
+def orderhistory(request):
+    user = get_object_or_404(User, email=request.user)
+    
+    try:
+        order = Orders.objects.filter(user=user).order_by('-date_time')[:5]
+    except:
+        return Response({"message":"Something is wrong :/"},status= status.HTTP_400_BAD_REQUEST)
+
+    return Response(
+        {
+           "orders" : list(order.values()) 
+        },
+        status = status.HTTP_200_OK
+    )
 
 
-
-#USER INFO 
+# USER INFO 
 
 
 @api_view(["POST"])

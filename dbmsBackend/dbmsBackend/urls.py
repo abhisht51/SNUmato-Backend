@@ -31,6 +31,8 @@ urlpatterns = [
     path('restaurants',views.getAllRestaurants),
     path('restaurants_menu',views.getmenu),
     path('cart',views.cart),
+    path('orderhistory',views.orderhistory),
+
     #USER URLS 
     path('user/register',views.register),
     path('user/verifyUser',views.verifyUser),
