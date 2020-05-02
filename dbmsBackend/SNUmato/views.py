@@ -77,7 +77,8 @@ def addtocart(request):
         },status=status.HTTP_400_BAD_REQUEST)
 
     try :
-        p = Current_order.objects.create(user=user,item_cost=menu_item.item_cost,item_quantity = quantity,item_name = menu_item.item_name,u_id=user.id,item_id=item_id)
+        p = Current_order.objects.create(user=user,item_cost=menu_item.item_cost,
+        item_quantity = quantity,item_name = menu_item.item_name,u_id=user.id,item_id=item_id)
         p.save()
     except:
         return Response({
@@ -137,7 +138,6 @@ def cart(request):
     totalcost = 0
     for i in p.values():
         totalcost = totalcost + int(i["item_cost"])*int(i["item_quantity"])
-        
     return Response({
          "data":list(p.values()),
          "total_cost" : totalcost,
@@ -146,17 +146,61 @@ def cart(request):
            "final_cost": totalcost*(1.1) + 10,     
     },status=status.HTTP_202_ACCEPTED)
 
+#PLACE ORDER 
 
+@api_view(["POST"])
+@permission_classes((IsAuthenticated, ))
+def placeorder(request):
+    user = get_object_or_404(User, email=request.user)
+    address = request.data.get('address')
+    payment_method = request.data.get('payment_method')
 
+    Uuid = uuid.uuid4()
+    uid = Uuid.hex[0:5]
+    while(len(Orders.objects.filter(user=user,order_id=uid)) > 0):
+        Uuid = uuid.uuid4()
+        uid  = Uuid.hex[0:5]
+    
+    try :
+        p = Current_order.objects.filter(user=user)
+    except:
+        return Response({
+            "message":"Error : No orders placed  OOF"
+        },status=status.HTTP_200_OK)
 
-
-
-
-
-
-
-
-
+    totalcost = 0.00
+    for i in p.values():
+        totalcost = totalcost + int(i["item_cost"])*int(i["item_quantity"])
+    totalcost = 10 + totalcost*1.1
+    if(totalcost <= 0):
+        raise ValueError
+       
+    order_details = json.dumps(list(p.values()))
+        
+    try:
+        order = Orders.objects.create(user=user,uuid=Uuid,order_id=uid)
+        order.order_description = order_details        
+        order.total_amount = totalcost
+        order.payment_method = payment_method   #TODO 
+        p.delete()
+        order.save()
+    except:
+        return Response({"message":"Unable to place order"})
+    
+    try:
+        if address:
+            user.address = address 
+            user.save()
+        else:
+            raise ValueError
+    except:
+        return Response({
+            "message":"Address could not be added"
+        })        
+    # p.delete()
+    return Response({
+         "message":"Your order has been placed successfully."
+    },status=status.HTTP_200_OK)
 
 
 
