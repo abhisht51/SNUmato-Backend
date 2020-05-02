@@ -218,10 +218,7 @@ def register(request):
     first_name = request.data.get('first_name')
     last_name = request.data.get('last_name')
     mobile_num = request.data.get('mobile_num')
-    uid = uuid.uuid4().hex[0:5]
-
-    while(len(User.objects.filter(uuid=uid)) > 0):
-        uid = uuid.uuid4().hex[0:5]
+ 
         
     user = User.objects.create_user(email=email, password=password)
     user.first_name = first_name
