@@ -35,7 +35,9 @@ urlpatterns = [
 
     #USER URLS 
     path('user/register',views.register),
-    path('user/verifyUser',views.verifyUser),
-    path('user/changePassword',views.changePassword),
+    path('user/info',views.userinfo),
+    path('user/changepassword',views.changePassword),
     path('user/login',views.Login),  
+    path('user/infoupdate',views.infoupdate),  
+
 ]

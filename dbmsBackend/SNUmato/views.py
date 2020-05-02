@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 import uuid
 from rest_framework import status
-from .serializers import cart_Serializers,menu_Serializers,restaurant_Serializer,orders_Serializers 
+from .serializers import user_Serializers
  
 
 
@@ -281,17 +281,23 @@ def changePassword(request):
 
 @api_view(["GET"])
 @permission_classes((IsAuthenticated, ))
-def verifyUser(request):
+def userinfo(request):
     user = get_object_or_404(User, email=request.user)
+    serializer = user_Serializers(user)
+    return Response(serializer.data)
 
-    user = User.objects.filter(email=request.user).values()[0]
 
-    return Response({
-        'status': 'success', 
-        'user_data': {
-        'email': user.get('email'),
-        "uuid" : user.get("uuid"),
-        'first_name': user.get('first_name'),
-        'last_name': user.get('last_name'),
-        'mobile_num': user.get('mobile_num'),
-    }})
+@api_view(["POST"])
+@permission_classes((IsAuthenticated, ))
+def infoupdate(request):
+    user = get_object_or_404(User, email=request.user)
+    try:
+        user.first_name = request.data.get('first_name')
+        user.last_name = request.data.get('last_name')
+        user.address = request.data.get('address')
+        user.mobile_num = request.data.get('mobile_num')
+        user.save()
+    except:
+        return Response("Something is wrong in the field details",status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(user_Serializers(user).data)
