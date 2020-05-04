@@ -63,7 +63,8 @@ def addtocart(request):
 
     try :
         p = Current_order.objects.get_or_create(user=user,item_cost=menu_item.item_cost,
-        item_quantity = quantity,item_name = menu_item.item_name,item_id=item_id)
+        item_name = menu_item.item_name,item_id=item_id)
+        p.item_quantity = quantity
         p.save()
     except:
         return Response({

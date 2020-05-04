@@ -108,6 +108,8 @@ class User(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+    active = models.BooleanField(default=True) # can log in
+    staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False) 
     address=models.CharField(max_length=500, default="")
     created_at = models.DateTimeField(default=datetime.now)
