@@ -35,15 +35,12 @@ class Restaurant(models.Model):
 class Menu_item(models.Model):
     restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE)  # concept of 1:1 Foreign KEY TODO 
     item_name = models.CharField(max_length=100)
-
     item_category = models.CharField(max_length=100)
     item_description = models.TextField(default="") #TODO check before sending as a JSON 
     item_cost = models.PositiveIntegerField()
-
     CHOICES = (("Veg","Veg"),
                 ("Non Veg","Non Veg"),
             )
-
     veg_nonVeg = models.CharField(max_length=100,null=True,choices=CHOICES) 
     
     class Meta:
@@ -71,7 +68,6 @@ class Orders(models.Model):                                      # db for displa
 class Current_order(models.Model):     
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     item_cost = models.CharField(max_length=100)
-    u_id = models.PositiveIntegerField(null=False)
     item_quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100)
     item_id = models.CharField(max_length=100)
@@ -112,9 +108,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    active = models.BooleanField(default=True) # can log in
-    staff = models.BooleanField(default=False)
-    admin = models.BooleanField(default=False)
+    admin = models.BooleanField(default=False) 
     address=models.CharField(max_length=500, default="")
     created_at = models.DateTimeField(default=datetime.now)
     mobile_num = models.CharField(max_length=10,null=True)

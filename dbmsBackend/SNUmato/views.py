@@ -40,7 +40,6 @@ def getAllRestaurants(request):
 @api_view(["GET"])
 def getmenu(request):
     resutaurant_id = request.GET.get('restaurant_id')
-    print(str(resutaurant_id) + " HEYLLLLLO")
     menu_items = Menu_item.objects.filter(restaurant=resutaurant_id)
     return Response({"restaurants":list(menu_items.values())})
 
@@ -63,8 +62,8 @@ def addtocart(request):
         },status=status.HTTP_400_BAD_REQUEST)
 
     try :
-        p = Current_order.objects.create(user=user,item_cost=menu_item.item_cost,
-        item_quantity = quantity,item_name = menu_item.item_name,u_id=user.id,item_id=item_id)
+        p = Current_order.objects.get_or_create(user=user,item_cost=menu_item.item_cost,
+        item_quantity = quantity,item_name = menu_item.item_name,item_id=item_id)
         p.save()
     except:
         return Response({

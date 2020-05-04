@@ -26,13 +26,11 @@ urlpatterns = [
     path('deleteitem',views.deleteitem),
     path('updatecart',views.updatecart),
     path('placeorder',views.placeorder),
-
     #GET resquest
     path('restaurants',views.getAllRestaurants),
     path('restaurants_menu',views.getmenu),
     path('cart',views.cart),
     path('orderhistory',views.orderhistory),
-
     #USER URLS 
     path('user/register',views.register),
     path('user/info',views.userinfo),
