@@ -60,11 +60,17 @@ def addtocart(request):
         return Response({
             "message":"Error No such item in the database"
         },status=status.HTTP_400_BAD_REQUEST)
-
+    if (len(Current_order.objects.filter(user=user, item_id=item_id))>0):
+            return Response({
+                "message":"the item is already in cart"
+            },status=status.HTTP_200_OK)
+            
     try :
-        p = Current_order.objects.get_or_create(user=user,item_cost=menu_item.item_cost,
-        item_name = menu_item.item_name,item_id=item_id)
-        p.item_quantity = quantity
+        
+        p = Current_order.objects.create(item_id=item_id,user=user,item_cost=menu_item.item_cost,
+        item_name = menu_item.item_name, item_quantity = quantity)
+    
+        
         p.save()
     except:
         return Response({
