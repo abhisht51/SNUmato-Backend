@@ -73,9 +73,7 @@ def addtocart(request):
         
         p.save()
     except:
-        return Response({
-            "message":"Error OOOOF"
-        },status=status.HTTP_400_BAD_REQUEST)
+       ced },status=status.HTTP_400_BAD_REQUEST)
     return Response({
          "message":"Item has been successfully added to the cart."
     },status=status.HTTP_202_ACCEPTED)
@@ -297,7 +295,7 @@ def infoupdate(request):
     try:
         user.first_name = request.data.get('first_name')
         user.last_name = request.data.get('last_name')
-        user.address = request.data.get('address')
+        #user.address = request.data.get('address')
         user.mobile_num = request.data.get('mobile_num')
         user.save()
     except:
