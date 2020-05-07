@@ -73,7 +73,7 @@ def addtocart(request):
         
         p.save()
     except:
-       ced },status=status.HTTP_400_BAD_REQUEST)
+       return Response({"message":"Some error occured, cannot add to cart "},status=status.HTTP_400_BAD_REQUEST)
     return Response({
          "message":"Item has been successfully added to the cart."
     },status=status.HTTP_202_ACCEPTED)
@@ -299,6 +299,6 @@ def infoupdate(request):
         user.mobile_num = request.data.get('mobile_num')
         user.save()
     except:
-        return Response("Something is wrong in the field details",status=status.HTTP_400_BAD_REQUEST)
+        return Response("Something is wrong i   n the field details",status=status.HTTP_400_BAD_REQUEST)
 
     return Response(user_Serializers(user).data)
