@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.contrib import auth
+import uuid
+
 # Create your models here.
 
 
@@ -33,15 +35,12 @@ class Restaurant(models.Model):
 class Menu_item(models.Model):
     restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE)  # concept of 1:1 Foreign KEY TODO 
     item_name = models.CharField(max_length=100)
-
     item_category = models.CharField(max_length=100)
     item_description = models.TextField(default="") #TODO check before sending as a JSON 
     item_cost = models.PositiveIntegerField()
-
     CHOICES = (("Veg","Veg"),
                 ("Non Veg","Non Veg"),
             )
-
     veg_nonVeg = models.CharField(max_length=100,null=True,choices=CHOICES) 
     
     class Meta:
@@ -52,27 +51,23 @@ class Menu_item(models.Model):
 
 class Orders(models.Model):                                      # db for displaying users past orders. 
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    order_id = models.PositiveIntegerField(null=False)
-    u_id = models.PositiveIntegerField(null=False)
+    order_id = models.CharField(max_length=7,null=False)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date_time = models.DateTimeField(auto_now=True,null=True)
     order_description = models.CharField(max_length=1000)
-    total_amount = models.DecimalField(max_digits=9,decimal_places=2)
-    CHOICES = (("Cash On Delivery","COD"),
-                ("Online-UPI","UPI"),
-                ("Online-Paytm","PAYTM"),)
+    total_amount = models.DecimalField(max_digits=9,decimal_places=2,null=True)
+    CHOICES = (("COD","Cash On Delivery"),
+                ("UPI","Online-UPI"),
+                ("PAYTM","Online-Paytm"),)
     payment_method = models.CharField(max_length=30,default='COD',choices=CHOICES)
     def __str__(self):
         return self.user.name + " " + self.order_id
     class Meta:
         db_table = 'Orders'
 
-class Current_order(models.Model): 
-    # TODO cart item funtion 
-    
+class Current_order(models.Model):     
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     item_cost = models.CharField(max_length=100)
-    u_id = models.PositiveIntegerField(null=False)
-
     item_quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100)
     item_id = models.CharField(max_length=100)
@@ -115,8 +110,8 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=255)
     active = models.BooleanField(default=True) # can log in
     staff = models.BooleanField(default=False)
-    admin = models.BooleanField(default=False)
-    uuid=models.CharField(max_length=200, default="")
+    admin = models.BooleanField(default=False) 
+    address=models.CharField(max_length=500, default="")
     created_at = models.DateTimeField(default=datetime.now)
     mobile_num = models.CharField(max_length=10,null=True)
      

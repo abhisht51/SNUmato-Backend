@@ -21,28 +21,21 @@ from SNUmato import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.test),
-    
-    
-    
-    
-        
     #POST resquest
     path('addtocart',views.addtocart),
     path('deleteitem',views.deleteitem),
     path('updatecart',views.updatecart),
-
-    
+    path('placeorder',views.placeorder),
     #GET resquest
     path('restaurants',views.getAllRestaurants),
     path('restaurants_menu',views.getmenu),
     path('cart',views.cart),
-
-
-
-    
+    path('orderhistory',views.orderhistory),
     #USER URLS 
     path('user/register',views.register),
-    path('user/verifyUser',views.verifyUser),
-    path('user/changePassword',views.changePassword),
+    path('user/info',views.userinfo),
+    path('user/changepassword',views.changePassword),
     path('user/login',views.Login),  
+    path('user/infoupdate',views.infoupdate),  
+
 ]

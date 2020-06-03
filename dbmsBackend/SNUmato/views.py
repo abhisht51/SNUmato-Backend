@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 import uuid
 from rest_framework import status
-from .serializers import cart_Serializers,menu_Serializers,restaurant_Serializer,orders_Serializers 
+from .serializers import user_Serializers
  
 
 
@@ -25,27 +25,13 @@ def test(request):
     return HttpResponse('Test chal rha') 
 
 
-
-
-
-# @api_view(["POST"])
-# def item_post(request):
-#     item_name = request.data.get('item_name')
-#     item_category = request.data.get('item_category')
-#     item_description = request.data.get('item_description')
-#     item_cost = request.data.get('item_cost')
-#     veg_nonVeg = request.data.get('vegnonVeg')
-#     #item = Menu_item.objects.create_user()
-
-
-
 #RESTAURANTS 
 
 @api_view(["GET"])
 def getAllRestaurants(request):
     cultural_data = []
     queryset = Restaurant.objects.all().values()
-    return JsonResponse({"restaurants":list(queryset)})
+    return Response({"restaurants":list(queryset)})
 
 
 
@@ -54,9 +40,8 @@ def getAllRestaurants(request):
 @api_view(["GET"])
 def getmenu(request):
     resutaurant_id = request.GET.get('restaurant_id')
-    print(str(resutaurant_id) + " HEYLLLLLO")
     menu_items = Menu_item.objects.filter(restaurant=resutaurant_id)
-    return JsonResponse({"restaurants":list(menu_items.values())})
+    return Response({"restaurants":list(menu_items.values())})
 
 
 #CURRENT ORDERS / CART 
@@ -75,14 +60,20 @@ def addtocart(request):
         return Response({
             "message":"Error No such item in the database"
         },status=status.HTTP_400_BAD_REQUEST)
-
+    if (len(Current_order.objects.filter(user=user, item_id=item_id))>0):
+            return Response({
+                "message":"the item is already in cart"
+            },status=status.HTTP_200_OK)
+            
     try :
-        p = Current_order.objects.create(user=user,item_cost=menu_item.item_cost,item_quantity = quantity,item_name = menu_item.item_name,u_id=user.id,item_id=item_id)
+        
+        p = Current_order.objects.create(item_id=item_id,user=user,item_cost=menu_item.item_cost,
+        item_name = menu_item.item_name, item_quantity = quantity)
+    
+        
         p.save()
     except:
-        return Response({
-            "message":"Error OOOOF"
-        },status=status.HTTP_400_BAD_REQUEST)
+       return Response({"message":"Some error occured, cannot add to cart "},status=status.HTTP_400_BAD_REQUEST)
     return Response({
          "message":"Item has been successfully added to the cart."
     },status=status.HTTP_202_ACCEPTED)
@@ -137,7 +128,6 @@ def cart(request):
     totalcost = 0
     for i in p.values():
         totalcost = totalcost + int(i["item_cost"])*int(i["item_quantity"])
-        
     return Response({
          "data":list(p.values()),
          "total_cost" : totalcost,
@@ -146,23 +136,83 @@ def cart(request):
            "final_cost": totalcost*(1.1) + 10,     
     },status=status.HTTP_202_ACCEPTED)
 
+#PLACE ORDER 
+
+@api_view(["POST"])
+@permission_classes((IsAuthenticated, ))
+def placeorder(request):
+    user = get_object_or_404(User, email=request.user)
+    address = request.data.get('address')
+    payment_method = request.data.get('payment_method')
+
+    Uuid = uuid.uuid4()
+    uid = Uuid.hex[0:5]
+    while(len(Orders.objects.filter(user=user,order_id=uid)) > 0):
+        Uuid = uuid.uuid4()
+        uid  = Uuid.hex[0:5]
+    
+    try :
+        p = Current_order.objects.filter(user=user)
+    except:
+        return Response({
+            "message":"Error : No orders placed  OOF"
+        },status=status.HTTP_200_OK)
+
+    totalcost = 0.00
+    for i in p.values():
+        totalcost = totalcost + int(i["item_cost"])*int(i["item_quantity"])
+    totalcost = 10 + totalcost*1.1
+    if(totalcost <= 0):
+        raise ValueError
+       
+    order_details = json.dumps(list(p.values()))
+        
+    try:
+        order = Orders.objects.create(user=user,uuid=Uuid,order_id=uid)
+        order.order_description = order_details        
+        order.total_amount = totalcost
+        order.payment_method = payment_method   #TODO 
+        p.delete()
+        order.save()
+    except:
+        return Response({"message":"Unable to place order"})
+    
+    try:
+        if address:
+            user.address = address 
+            user.save()
+        else:
+            raise ValueError
+    except:
+        return Response({
+            "message":"Address could not be added"
+        })        
+    # p.delete()
+    return Response({
+         "message":"Your order has been placed successfully."
+    },status=status.HTTP_200_OK)
 
 
+# ORDER HISTORY  
+@api_view(["GET"])
+@permission_classes((IsAuthenticated, ))
+def orderhistory(request):
+    user = get_object_or_404(User, email=request.user)
+    
+    try:
+        order = Orders.objects.filter(user=user).order_by('-date_time')[:5]
+    except:
+        return Response({"message":"Something is wrong :/"},status= status.HTTP_400_BAD_REQUEST)
+
+    return Response(
+        {
+           "orders" : list(order.values()) 
+        },
+        status = status.HTTP_200_OK
+    )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#USER INFO 
+# USER INFO 
 
 
 @api_view(["POST"])
@@ -172,10 +222,7 @@ def register(request):
     first_name = request.data.get('first_name')
     last_name = request.data.get('last_name')
     mobile_num = request.data.get('mobile_num')
-    uid = uuid.uuid4().hex[0:5]
-
-    while(len(User.objects.filter(uuid=uid)) > 0):
-        uid = uuid.uuid4().hex[0:5]
+ 
         
     user = User.objects.create_user(email=email, password=password)
     user.first_name = first_name
@@ -235,17 +282,23 @@ def changePassword(request):
 
 @api_view(["GET"])
 @permission_classes((IsAuthenticated, ))
-def verifyUser(request):
+def userinfo(request):
     user = get_object_or_404(User, email=request.user)
+    serializer = user_Serializers(user)
+    return Response(serializer.data)
 
-    user = User.objects.filter(email=request.user).values()[0]
 
-    return Response({
-        'status': 'success', 
-        'user_data': {
-        'email': user.get('email'),
-        "uuid" : user.get("uuid"),
-        'first_name': user.get('first_name'),
-        'last_name': user.get('last_name'),
-        'mobile_num': user.get('mobile_num'),
-    }})
+@api_view(["POST"])
+@permission_classes((IsAuthenticated, ))
+def infoupdate(request):
+    user = get_object_or_404(User, email=request.user)
+    try:
+        user.first_name = request.data.get('first_name')
+        user.last_name = request.data.get('last_name')
+        #user.address = request.data.get('address')
+        user.mobile_num = request.data.get('mobile_num')
+        user.save()
+    except:
+        return Response("Something is wrong i   n the field details",status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(user_Serializers(user).data)
