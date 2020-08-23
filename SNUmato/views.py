@@ -22,7 +22,7 @@ from .serializers import user_Serializers
 
 # Create your views here.
 def test(request):
-    return HttpResponse('Test chal rha') 
+    return HttpResponse('Test is working') 
 
 
 #RESTAURANTS 
@@ -90,7 +90,7 @@ def updatecart(request):
         p.save()
     except:
         return Response({
-            "message":"Error OOOOF"
+            "message":"Error"
         },status=status.HTTP_400_BAD_REQUEST)
     return Response({
          "message":"Success. Item Quantity has been updated."
@@ -106,7 +106,7 @@ def deleteitem(request):
         p.delete()               
     except:
         return Response({
-            "message":"Error  No such item in the database OOF"
+            "message":"Error  No such item in the database"
         },status=status.HTTP_400_BAD_REQUEST)
     return Response({
          "message":"Success. Item has been removed from the cart."
@@ -121,7 +121,7 @@ def cart(request):
         p = Current_order.objects.filter(user=user)
     except:
         return Response({
-            "message":"Error : Cart is empty OOF"
+            "message":"Error : Cart is empty"
         },status=status.HTTP_200_OK)
 
 
@@ -155,7 +155,7 @@ def placeorder(request):
         p = Current_order.objects.filter(user=user)
     except:
         return Response({
-            "message":"Error : No orders placed  OOF"
+            "message":"Error : No orders placed "
         },status=status.HTTP_200_OK)
 
     totalcost = 0.00
@@ -202,7 +202,7 @@ def orderhistory(request):
     try:
         order = Orders.objects.filter(user=user).order_by('-date_time')[:5]
     except:
-        return Response({"message":"Something is wrong :/"},status= status.HTTP_400_BAD_REQUEST)
+        return Response({"message":"Something is wrong"},status= status.HTTP_400_BAD_REQUEST)
 
     return Response(
         {
@@ -299,6 +299,6 @@ def infoupdate(request):
         user.mobile_num = request.data.get('mobile_num')
         user.save()
     except:
-        return Response("Something is wrong i   n the field details",status=status.HTTP_400_BAD_REQUEST)
+        return Response("Something is wrong in the field details",status=status.HTTP_400_BAD_REQUEST)
 
     return Response(user_Serializers(user).data)
