@@ -9,5 +9,5 @@ pyOpenSSL==19.0.0
 requests==2.22.0
 sqlparse==0.3.0
 virtualenv==16.6.2
-Werkzeug==0.15.4
+Werkzeug==0.15.5
 oauth2client==4.1.3
